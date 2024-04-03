@@ -28,13 +28,7 @@
 #include <miopen/graphapi/tensor.hpp>
 
 #include <algorithm>
-<<<<<<< HEAD
-||||||| merged common ancestors
-#include <vector>
-=======
 #include <deque>
-#include <vector>
->>>>>>> WIP: implement matching tests for op graphs
 #include <unordered_map>
 #include <vector>
 
@@ -164,8 +158,12 @@ protected:
     }
 };
 
+
+namespace internal {
 using Path = std::vector<OpNode*>;
 using VecOfPaths = std::vector<Path>;
+using MapSizeToPathVec = std::unordered_map<size_t, VecOfPaths>;
+}// end namespace internal
 
 class OpGraph
 {

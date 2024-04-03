@@ -130,11 +130,7 @@ bool checkSameDegreeVecs(const OpGraph& left, const OpGraph& right) {
   return l_degs == r_degs;
 }
 
-bool checkSamePaths(const OpGraph& left, const OpGraph& right) {
-
-  using MapSizeToPathVec = std::unordered_map<size_t, VecOfPaths>;
-
-  auto group_by_size = [] (VecOfPaths&& all_paths) {
+auto groupBySize(VecOfPaths&& all_paths) {
     MapSizeToPathVec paths_by_size;
 
     for (auto& p: all_paths) {
@@ -143,7 +139,30 @@ bool checkSamePaths(const OpGraph& left, const OpGraph& right) {
     }
 
     return paths_by_size;
-  };
+}
+
+auto sumPathSizes(const VecOfPaths& all_paths) {
+    size_t ret = 0;
+    for (const auto& p: all_paths) {
+      ret += p.size();
+    }
+    return ret;
+}
+
+bool checkEqualPaths(VecOfPaths& left, VecOfPaths& right) { 
+    if (left.size() != right.size()) {
+      return false;
+    }
+
+    std::sort(left.begin(), left.end());
+    std::sort(right.begin(), right.end());
+
+    return left == right;
+}
+
+
+bool checkSamePaths(const OpGraph& left, const OpGraph& right) {
+
 
   MapSizeToPathVec l_paths_by_sz{};
   auto r_paths_by_sz = l_paths_by_sz;
@@ -156,20 +175,12 @@ bool checkSamePaths(const OpGraph& left, const OpGraph& right) {
       return false;
     }
 
-    auto sum_paths = [] (const VecOfPaths all_paths) {
-      size_t ret = 0;
-      for (const auto& p: all_paths) {
-        ret += p.size();
-      }
-      return ret;
-    };
-
-    if (sum_paths(l_paths) != sum_paths(r_paths)) {
+    if (SumPathSizes(l_paths) != SumPathSizes(r_paths)) {
       return false;
     }
 
-    l_paths_by_sz = group_by_size(std::move(l_paths));
-    r_paths_by_sz = group_by_size(std::move(r_paths));
+    l_paths_by_sz = groupBySize(std::move(l_paths));
+    r_paths_by_sz = groupBySize(std::move(r_paths));
   }
 
   auto get_keys = [] (const MapSizeToPathVec& paths_by_size) {
@@ -187,19 +198,8 @@ bool checkSamePaths(const OpGraph& left, const OpGraph& right) {
     return false;
   }
 
-  auto check_equal_path_vecs = [](VecOfPaths& left, const VecOfPaths& right) {
-    if (left.size() != right.size()) {
-      return false;
-    }
-
-    std::sort(left.begin(), left.end());
-    std::sort(right.begin(), right.end());
-
-    return left == right;
-  }
-
   for (size_t k: l_keys) {
-    if (!check_equal_path_vecs(l_paths_by_sz[k], r_paths_by_sz[k])) {
+    if (!checkEqualPaths(l_paths_by_sz[k], r_paths_by_sz[k])) {
       return false;
     }
   }
