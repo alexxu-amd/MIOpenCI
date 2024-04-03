@@ -159,11 +159,9 @@ protected:
 };
 
 
-namespace internal {
 using Path = std::vector<OpNode*>;
 using VecOfPaths = std::vector<Path>;
 using MapSizeToPathVec = std::unordered_map<size_t, VecOfPaths>;
-}// end namespace internal
 
 class OpGraph
 {
@@ -210,7 +208,8 @@ public:
       // at construction time perhaps. 
       VecOfPaths all_paths;
 
-      std::deque<Path> paths_to_explore = {mSrcNode};
+      std::deque<Path> paths_to_explore;
+      paths_to_explore.emplace_back(Path{const_cast<SourceOpNode*>(&mSrcNode)});
 
       while (!paths_to_explore.empty()) {
         Path path = paths_to_explore.front();

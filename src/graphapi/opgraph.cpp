@@ -175,7 +175,7 @@ bool checkSamePaths(const OpGraph& left, const OpGraph& right) {
       return false;
     }
 
-    if (SumPathSizes(l_paths) != SumPathSizes(r_paths)) {
+    if (sumPathSizes(l_paths) != sumPathSizes(r_paths)) {
       return false;
     }
 
